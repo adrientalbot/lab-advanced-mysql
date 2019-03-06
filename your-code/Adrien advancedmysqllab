@@ -1,0 +1,14 @@
+SELECT title_id, au_id, (Advance + sumroyalties) AS Profits FROM (
+	SELECT title_id, au_id, SUM(Royalty) AS sumroyalties, Advance FROM (
+		SELECT titleauthor.title_id, titleauthor.au_id, ROUND(titles.advance * titleauthor.royaltyper / 100, 2) as Advance, ROUND(titles.price * sales.qty * titles.royalty / 100 * titleauthor.royaltyper / 100, 2) AS Royalty 
+		FROM publications.titleauthor
+    	INNER JOIN publications.sales
+    	ON titleauthor.title_id = sales.title_id
+    	INNER JOIN publications.titles
+    	ON titleauthor.title_id = titles.title_id   	
+	) AS AggRoyalties 
+	GROUP BY title_id, au_id 
+) AS author_profits
+GROUP BY title_id, au_id
+ORDER BY Profits desc
+LIMIT 3;
